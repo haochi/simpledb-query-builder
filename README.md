@@ -18,10 +18,6 @@ There are three classes in this library, `Query`, `Comparison`, and `Attribute`.
 
 These are options for `Query#select`.
 
-#### Static Methods
-
-* `Query#intersect(comparison_1, ..., comparison_N)`: Intersects multiple comparisons and returns a string of its SQL representation.
-
 #### Methods
 
 * `Query#select(param)`: Sets the attributes to return. `param` can be `Query.ALL`, `Query.ITEM_NAME`, `Query.COUNT`, a string of attributes (e.g. `'attr1,attr2,...attrN'`), or an array of `Attribute`s.
@@ -29,6 +25,7 @@ These are options for `Query#select`.
 * `Query#where(comparison:Comparison)`: Sets the `where` part of the query.
 * `Query#order(order_by: String, desc=false)`: Order result by `order_by`.
 * `Query#limit(take:Number)`: Limit the number of rows to return.
+* `Query#intersect(comparison)`: Intersects another comparison. Essentially it will be `(this INTERSECTION comparison)`.
 * `Query#to_sql()`: Returns to string representation in quasi-SQL format.
 
 ### Comparison
