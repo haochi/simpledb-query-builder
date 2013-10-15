@@ -60,7 +60,7 @@ These are options for `Query#select`.
 
 ### Example
 
-    var builder = require('./lib/query')
+    var builder = require('simpledb-query-builder')
       , attr = builder.attr
       , every = builder.every
       , Query = builder.Query;
