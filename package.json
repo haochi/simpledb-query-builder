@@ -1,0 +1,20 @@
+{
+  "name": "simpledb-query-builder",
+  "version": "0.0.1",
+  "description": "SimpleDB Query Builder for Node.js",
+  "main": "lib/query.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/haochi/simpledb-query-builder.git"
+  },
+  "keywords": [
+    "simpledb",
+    "query",
+    "sql"
+  ],
+  "author": "Haochi Chen",
+  "readmeFilename": "README.md",
+}
