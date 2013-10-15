@@ -23,9 +23,9 @@ These are options for `Query#select`.
 * `Query#select(param)`: Sets the attributes to return. `param` can be `Query.ALL`, `Query.ITEM_NAME`, `Query.COUNT`, a string of attributes (e.g. `'attr1,attr2,...attrN'`), or an array of `Attribute`s.
 * `Query#from(domain:String)`: Sets the domain to select from.
 * `Query#where(comparison:Comparison)`: Sets the `where` part of the query.
+* `Query#intersect(comparison)`: Intersects another comparison. Essentially it will be `(this INTERSECTION comparison)`.
 * `Query#order(order_by: String, desc=false)`: Order result by `order_by`.
 * `Query#limit(take:Number)`: Limit the number of rows to return.
-* `Query#intersect(comparison)`: Intersects another comparison. Essentially it will be `(this INTERSECTION comparison)`.
 * `Query#to_sql()`: Returns to string representation in quasi-SQL format.
 
 ### Comparison
@@ -38,6 +38,10 @@ These are options for `Query#select`.
 
 
 ### Attribute
+
+#### Class Methods
+
+* `itemName()`: creates a `itemName()` attribute so it doesn't get escaped on serialization.
 
 #### Methods
 * `new Attribute(name)`: Creates a new attribute with the attribute name `name` 
