@@ -1,10 +1,10 @@
 {
   "name": "simpledb-query-builder",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "SimpleDB Query Builder for Node.js",
   "main": "lib/query.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
     "sql"
   ],
   "author": "Haochi Chen",
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "mocha": "*"
+  }
 }
