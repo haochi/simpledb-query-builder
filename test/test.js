@@ -26,7 +26,7 @@ describe('Queries from Query 101', function(){
     it('should filter where city = Seattle or city = Portland', function(){
       var city = attr("city")
       var query = q().where(city.equal("Seattle").or(city.equal("Portland"))).to_sql()
-      assert.equal(query, "SELECT * FROM mydomain WHERE `city` = 'Seattle' OR `city` = 'Portland'");
+      assert.equal(query, "SELECT * FROM mydomain WHERE `city` = 'Seattle' OR (`city` = 'Portland')");
     })
   })
 
@@ -39,7 +39,7 @@ describe('Queries from Query 101', function(){
     it('should filter where name != John and name != Humberto', function(){
       var name = attr("name")
       var query = q().where(name.not_equal("John").and(name.not_equal("Humberto"))).to_sql()
-      assert.equal(query, "SELECT * FROM mydomain WHERE `name` != 'John' AND `name` != 'Humberto'");
+      assert.equal(query, "SELECT * FROM mydomain WHERE `name` != 'John' AND (`name` != 'Humberto')");
     })
   })
 
