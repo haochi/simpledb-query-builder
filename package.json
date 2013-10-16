@@ -1,6 +1,6 @@
 {
   "name": "simpledb-query-builder",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "SimpleDB Query Builder for Node.js",
   "main": "lib/query.js",
   "scripts": {
