@@ -28,7 +28,7 @@ These are options for `Query#select`.
 * `Query#from(domain:String)`: Sets the domain to select from.
 * `Query#where(predicate:Predicate)`: Sets the `where` part of the query.
 * `Query#intersect(predicate:Predicate)`: Intersects another predicate. Essentially it will be `(this INTERSECTION predicate)`.
-* `Query#order(order_by: String, desc=false)`: Order result by `order_by`.
+* `Query#order(order_by:Attribute, desc=false)`: Order result by `order_by`.
 * `Query#limit(take:Number)`: Limit the number of rows to return.
 * `Query#to_sql()`: Returns to string representation in quasi-SQL format.
 
@@ -70,17 +70,15 @@ These are options for `Query#select`.
     var last_name = attr("last_name");
     var grade = attr("grade");
 
-    var predicate = first_name.equal("john")
-      .and(last_name.not_equal("smith"))
-      .and(grade.equal("8")
-          .or(grade.equal("9")))
-      .or(last_name.is_null())
-      .and(last_name.is_not_null())
-      .and(every(last_name).in([1]))
-      .intersect(last_name.equal("johnson"))
+    (new Query).select(Query.ALL).from("users").where(first_name.equal("John")).to_sql()
+    // SELECT * FROM users WHERE first_name = 'John'
 
-    var query = new Query();
-    query.select(Query.ALL).where(predicate).from("users").order(builder.itemName());
-    query.limit(10);
+    var query_one = new Query;
+    var predicate_one = first_name.equal("John").and(grade.gt("7"))
+    query_one.select(Query.COUNT).from("users").where(predicate_one).to_sql()
+    // SELECT COUNT(*) FROM users WHERE first_name = 'John' AND grade > '7'
 
-    console.log(query.to_sql())
+    var query_two = new Query;
+    var predicate_two = first_name.equal("John").and(grade.gt("7")).intersect(first_name.equal("Joseph").and(grade.lt("8")))
+    query_two.from("users").where(predicate_two).to_sql()
+    // SELECT * FROM users WHERE (first_name = 'John' AND grade > '7') INTERSECTION (first_name = 'Joseph' AND grade < '8')

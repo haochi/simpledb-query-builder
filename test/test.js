@@ -134,10 +134,11 @@ describe('Limit', function(){
 })
 
 describe('More Complex Queries', function(){
+  var name = attr("name")
+    , email = attr("email")
+    , score = attr("score")
+
   it('should nest correctly', function(){
-    var name = attr("name")
-      , email = attr("email")
-      , score = attr("score")
     var query = q().where(
       name.equal("John").or(
         name.equal("Ben").and(email.equal("example@example.com"))
@@ -146,6 +147,30 @@ describe('More Complex Queries', function(){
 
     assert.equal(query, "SELECT * FROM mydomain WHERE name = 'John' OR (name = 'Ben' AND email = 'example@example.com') AND score = '100'")
   })
+
+  it('should intersect correctly', function(){
+    var query = q().where(name.equal("John").intersect(name.equal("Ben"))).to_sql()
+    assert.equal(query, "SELECT * FROM mydomain WHERE (name = 'John') INTERSECTION (name = 'Ben')")
+  })
 })
 
+describe('The Examples Should be Valid', function(){
+  it('should pass', function(){
+    var first_name = attr("first_name");
+    var last_name = attr("last_name");
+    var grade = attr("grade");
 
+    var query_zero_sql = (new Query).select(Query.ALL).from("users").where(first_name.equal("John")).to_sql()
+    assert.equal(query_zero_sql, "SELECT * FROM users WHERE first_name = 'John'")
+
+    var query_one = new Query;
+    var predicate_one = first_name.equal("John").and(grade.gt("7"))
+    var query_one_sql = query_one.select(Query.COUNT).from("users").where(predicate_one).to_sql()
+    assert.equal(query_one_sql, "SELECT COUNT(*) FROM users WHERE first_name = 'John' AND grade > '7'")
+
+    var query_two = new Query;
+    var predicate_two = first_name.equal("John").and(grade.gt("7")).intersect(first_name.equal("Joseph").and(grade.lt("8")))
+    var query_two_sql = query_two.from("users").where(predicate_two).to_sql()
+    assert.equal(query_two_sql, "SELECT * FROM users WHERE (first_name = 'John' AND grade > '7') INTERSECTION (first_name = 'Joseph' AND grade < '8')")
+  })
+})
