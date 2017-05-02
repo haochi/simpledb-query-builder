@@ -27,7 +27,7 @@ describe('Queries from Query 101', function(){
         it('should filter where grade '+operator+' 1', function(){
           var grade = attr("grade");
           var query = q().where(grade[method]("1")).to_sql()
-          assert.equal(query, "SELECT * FROM mydomain WHERE grade "+operator+" '1'")
+          assert.equal(query, "SELECT * FROM `mydomain` WHERE grade "+operator+" '1'")
         })
       })
     })
@@ -38,7 +38,7 @@ describe('Queries from Query 101', function(){
       it('should filter grade in (1,2,3)', function(){
         var grade = attr("grade");
         var query = q().where(grade.in([1,2,3])).to_sql()
-        assert.equal(query, "SELECT * FROM mydomain WHERE grade IN ('1','2','3')")
+        assert.equal(query, "SELECT * FROM `mydomain` WHERE grade IN ('1','2','3')")
       })
     })
 
@@ -46,7 +46,7 @@ describe('Queries from Query 101', function(){
       it('should filter grade between 1 and 3)', function(){
         var grade = attr("grade");
         var query = q().where(grade.between(1,3)).to_sql()
-        assert.equal(query, "SELECT * FROM mydomain WHERE grade BETWEEN '1' AND '3'")
+        assert.equal(query, "SELECT * FROM `mydomain` WHERE grade BETWEEN '1' AND '3'")
       })
     })
 
@@ -58,7 +58,7 @@ describe('Queries from Query 101', function(){
         it('should filter grade ' + operator, function(){
           var grade = attr("grade");
           var query = q().where(grade[method]()).to_sql()
-          assert.equal(query, "SELECT * FROM mydomain WHERE grade " + operator)
+          assert.equal(query, "SELECT * FROM `mydomain` WHERE grade " + operator)
         })
       })
     })
@@ -68,25 +68,32 @@ describe('Queries from Query 101', function(){
     it('reserved keywords in attribute name should be quoted', function(){
       var where = attr("where")
       var query = q().where(where.not_equal("USA").and(where.not_equal("Canada"))).to_sql()
-      assert.equal(query, "SELECT * FROM mydomain WHERE `where` != 'USA' AND `where` != 'Canada'");
+      assert.equal(query, "SELECT * FROM `mydomain` WHERE `where` != 'USA' AND `where` != 'Canada'");
     })
 
     it('not standard identifiers should be quoted', function(){
       var where = attr("1World1Dream")
       var query = q().where(where.not_equal("true")).to_sql()
-      assert.equal(query, "SELECT * FROM mydomain WHERE `1World1Dream` != 'true'");
+      assert.equal(query, "SELECT * FROM `mydomain` WHERE `1World1Dream` != 'true'");
     })
 
     it("values with one single quote should be properly escaped", function(){
       var last_name = attr("last_name")
       var query = q().where(last_name.like("O'Neal%")).to_sql()
-      assert.equal(query, "SELECT * FROM mydomain WHERE last_name LIKE 'O''Neal%'");
+      assert.equal(query, "SELECT * FROM `mydomain` WHERE last_name LIKE 'O''Neal%'");
     })
 
     it("asterisk in attribute name should be escaped", function(){
       var last_name = attr("last`name")
       var query = q().where(last_name.like("O'Neal%")).to_sql()
-      assert.equal(query, "SELECT * FROM mydomain WHERE `last``name` LIKE 'O''Neal%'");
+      assert.equal(query, "SELECT * FROM `mydomain` WHERE `last``name` LIKE 'O''Neal%'");
+    })
+
+    it("domain name should be escaped (otherwise hyphens in domains break query)", function(){
+      var domain = "my-domain";
+      var where = attr("1World1Dream");
+      var query = (new Query).from("my-domain").where(where.not_equal("true")).to_sql();
+      assert.equal(query, "SELECT * FROM `my-domain` WHERE `1World1Dream` != 'true'");
     })
   })
 
@@ -95,41 +102,41 @@ describe('Queries from Query 101', function(){
 describe('Projection', function(){
   it('should select all by default', function(){
     var query = q().to_sql()
-    assert.equal(query, "SELECT * FROM mydomain");
+    assert.equal(query, "SELECT * FROM `mydomain`");
   })
 
   it('should select all', function(){
     var query = q().select(Query.ALL).to_sql()
-    assert.equal(query, "SELECT * FROM mydomain");
+    assert.equal(query, "SELECT * FROM `mydomain`");
   })
 
   it('should select count(*)', function(){
     var query = q().select(Query.COUNT).to_sql()
-    assert.equal(query, "SELECT COUNT(*) FROM mydomain");
+    assert.equal(query, "SELECT COUNT(*) FROM `mydomain`");
   })
 
   it('should select itemName()', function(){
     var query = q().select(Query.ITEM_NAME).to_sql()
-    assert.equal(query, "SELECT itemName() FROM mydomain");
+    assert.equal(query, "SELECT itemName() FROM `mydomain`");
   })
 })
 
 describe('Order', function(){
   it('should order by name and use default ordering', function(){
     var query = q().select(Query.ITEM_NAME).order(attr('name')).to_sql()
-    assert.equal(query, "SELECT itemName() FROM mydomain ORDER BY name");
+    assert.equal(query, "SELECT itemName() FROM `mydomain` ORDER BY name");
   })
 
   it('should order by itemName DESC', function(){
     var query = q().select(Query.ITEM_NAME).order(attr('name'), true).to_sql()
-    assert.equal(query, "SELECT itemName() FROM mydomain ORDER BY name DESC");
+    assert.equal(query, "SELECT itemName() FROM `mydomain` ORDER BY name DESC");
   })
 })
 
 describe('Limit', function(){
   it('should limit 10', function(){
     var query = q().select(Query.ITEM_NAME).limit(10).to_sql()
-    assert.equal(query, "SELECT itemName() FROM mydomain LIMIT 10");
+    assert.equal(query, "SELECT itemName() FROM `mydomain` LIMIT 10");
   })
 })
 
@@ -145,12 +152,12 @@ describe('More Complex Queries', function(){
       ).and(score.equal("100"))
     ).to_sql()
 
-    assert.equal(query, "SELECT * FROM mydomain WHERE name = 'John' OR (name = 'Ben' AND email = 'example@example.com') AND score = '100'")
+    assert.equal(query, "SELECT * FROM `mydomain` WHERE name = 'John' OR (name = 'Ben' AND email = 'example@example.com') AND score = '100'")
   })
 
   it('should intersect correctly', function(){
     var query = q().where(name.equal("John").intersect(name.equal("Ben"))).to_sql()
-    assert.equal(query, "SELECT * FROM mydomain WHERE (name = 'John') INTERSECTION (name = 'Ben')")
+    assert.equal(query, "SELECT * FROM `mydomain` WHERE (name = 'John') INTERSECTION (name = 'Ben')")
   })
 })
 
@@ -161,16 +168,16 @@ describe('The Examples Should be Valid', function(){
     var grade = attr("grade");
 
     var query_zero_sql = (new Query).select(Query.ALL).from("users").where(first_name.equal("John")).to_sql()
-    assert.equal(query_zero_sql, "SELECT * FROM users WHERE first_name = 'John'")
+    assert.equal(query_zero_sql, "SELECT * FROM `users` WHERE first_name = 'John'")
 
     var query_one = new Query;
     var predicate_one = first_name.equal("John").and(grade.gt("7"))
     var query_one_sql = query_one.select(Query.COUNT).from("users").where(predicate_one).to_sql()
-    assert.equal(query_one_sql, "SELECT COUNT(*) FROM users WHERE first_name = 'John' AND grade > '7'")
+    assert.equal(query_one_sql, "SELECT COUNT(*) FROM `users` WHERE first_name = 'John' AND grade > '7'")
 
     var query_two = new Query;
     var predicate_two = first_name.equal("John").and(grade.gt("7")).intersect(first_name.equal("Joseph").and(grade.lt("8")))
     var query_two_sql = query_two.from("users").where(predicate_two).to_sql()
-    assert.equal(query_two_sql, "SELECT * FROM users WHERE (first_name = 'John' AND grade > '7') INTERSECTION (first_name = 'Joseph' AND grade < '8')")
+    assert.equal(query_two_sql, "SELECT * FROM `users` WHERE (first_name = 'John' AND grade > '7') INTERSECTION (first_name = 'Joseph' AND grade < '8')")
   })
 })
